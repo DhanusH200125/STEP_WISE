@@ -22,6 +22,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/routines', require('./routes/routine.routes'));
+app.use('/api/tasks', require('./routes/task.routes'));
 // app.use('/api/routines',  require('./routes/routine.routes'));   // FR-3 (next)
 // app.use('/api/tasks',     require('./routes/task.routes'));       // FR-5
 // app.use('/api/sprints',   require('./routes/sprint.routes'));     // FR-6
