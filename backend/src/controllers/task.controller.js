@@ -1,6 +1,7 @@
 // backend/src/controllers/task.controller.js
 const { validationResult } = require('express-validator');
 const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../models/task.model');
+const logger = require('../services/logger.service');
 
 const VALID_DURATIONS = [15, 30, 60, 120];
 
@@ -11,6 +12,7 @@ const addTask = async (req, res, next) => {
       return res.status(400).json({ error: { message: 'Validation failed', details: errors.array() } });
 
     const task = await createTask(req.user.id, req.body);
+    await logger.taskCreated(req.user.id, task);
     return res.status(201).json({ message: 'Task created', task });
   } catch (err) { next(err); }
 };
@@ -41,6 +43,7 @@ const editTask = async (req, res, next) => {
     if (!task) return res.status(404).json({ error: { message: 'Task not found' } });
 
     const updated = await updateTask(req.params.id, req.user.id, req.body);
+    await logger.taskUpdated(req.user.id, updated, Object.keys(req.body));
     return res.status(200).json({ message: 'Task updated', task: updated });
   } catch (err) { next(err); }
 };
@@ -62,6 +65,7 @@ const completeTask = async (req, res, next) => {
       status: 'completed',
       actualMinutes: req.body.actualMinutes,
     });
+    await logger.taskCompleted(req.user.id, updated, req.body.actualMinutes || updated.estimated_minutes); 
     return res.status(200).json({ message: 'Task marked as completed', task: updated });
   } catch (err) { next(err); }
 };

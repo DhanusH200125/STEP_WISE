@@ -6,6 +6,7 @@ const {
 } = require('../models/sprint.model');
 const { findRescheduleOptions, checkOverflow } = require('../services/reschedule.service');
 const { updateTask } = require('../models/task.model');
+const logger = require('../services/logger.service');
 
 /**
  * POST /api/reschedule/slots/:slotId/miss
@@ -21,6 +22,7 @@ const missSlot = async (req, res, next) => {
 
     // Mark as missed
     await updateSlotStatus(req.params.slotId, req.user.id, 'missed');
+    await logger.slotMissed(req.user.id, slot);
 
     // Find reschedule options (look from today onwards)
     const today = new Date().toISOString().split('T')[0];
@@ -59,6 +61,7 @@ const confirmReschedule = async (req, res, next) => {
       date, startTime, endTime,
       'Rescheduled by user after missed slot'
     );
+    await logger.slotRescheduled(req.user.id, slot, newSlot);
 
     // Mark original as rescheduled
     await updateSlotStatus(req.params.slotId, req.user.id, 'rescheduled');
@@ -88,6 +91,8 @@ const completeSlot = async (req, res, next) => {
     await updateSlotStatus(
       req.params.slotId, req.user.id, 'completed', new Date().toISOString()
     );
+    
+    await logger.slotCompleted(req.user.id, slot, actualMinutes);
 
     // Update task actual_minutes
     await updateTask(slot.task_id, req.user.id, {

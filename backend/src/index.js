@@ -26,6 +26,8 @@ app.use('/api/tasks', require('./routes/task.routes'));
 app.use('/api/sprints', require('./routes/sprint.routes'));
 app.use('/api/reschedule', require('./routes/reschedule.routes'));
 app.use('/api/growth', require('./routes/growth.routes'));
+app.use('/api/logs', require('./routes/log.routes'));
+
 // app.use('/api/routines',  require('./routes/routine.routes'));   // FR-3 (next)
 // app.use('/api/tasks',     require('./routes/task.routes'));       // FR-5
 // app.use('/api/sprints',   require('./routes/sprint.routes'));     // FR-6
