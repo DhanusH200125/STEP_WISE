@@ -1,19 +1,44 @@
 // backend/src/models/task.model.js
 const { query } = require('../config/db');
 
+// const createTask = async (userId, fields) => {
+//   const {
+//     title, description, domain, priority,
+//     estimatedMinutes, energyLevel, deadline, deadlineType,
+//   } = fields;
+
+//   const { rows } = await query(
+//     `INSERT INTO tasks
+//        (user_id, title, description, domain, priority, estimated_minutes, energy_level, deadline, deadline_type)
+//      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+//      RETURNING *`,
+//     [userId, title, description || null, domain, priority || 'medium',
+//      estimatedMinutes, energyLevel || 'medium', deadline || null, deadlineType || null]
+//   );
+//   return rows[0];
+// };
+
 const createTask = async (userId, fields) => {
   const {
     title, description, domain, priority,
     estimatedMinutes, energyLevel, deadline, deadlineType,
+    preferredDate, preferredStartTime, preferredEndTime,
   } = fields;
+
+  const isTimeHinted = !!(preferredDate && preferredStartTime && preferredEndTime);
 
   const { rows } = await query(
     `INSERT INTO tasks
-       (user_id, title, description, domain, priority, estimated_minutes, energy_level, deadline, deadline_type)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       (user_id, title, description, domain, priority, estimated_minutes,
+        energy_level, deadline, deadline_type,
+        preferred_date, preferred_start_time, preferred_end_time, is_time_hinted)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING *`,
-    [userId, title, description || null, domain, priority || 'medium',
-     estimatedMinutes, energyLevel || 'medium', deadline || null, deadlineType || null]
+    [
+      userId, title, description || null, domain, priority || 'medium',
+      estimatedMinutes, energyLevel || 'medium', deadline || null, deadlineType || null,
+      preferredDate || null, preferredStartTime || null, preferredEndTime || null, isTimeHinted,
+    ]
   );
   return rows[0];
 };
@@ -76,6 +101,10 @@ const updateTask = async (id, userId, fields) => {
     priority: 'priority', status: 'status',
     estimatedMinutes: 'estimated_minutes', energyLevel: 'energy_level',
     deadline: 'deadline', deadlineType: 'deadline_type', isLocked: 'is_locked',
+    preferredDate: 'preferred_date',
+    preferredStartTime: 'preferred_start_time',
+    preferredEndTime: 'preferred_end_time',
+    isTimeHinted: 'is_time_hinted',
   };
 
   for (const [jsKey, col] of Object.entries(colMap)) {

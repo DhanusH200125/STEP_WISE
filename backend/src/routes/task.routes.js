@@ -22,6 +22,9 @@ const taskRules = [
   body('deadline').optional().isDate().withMessage('deadline must be YYYY-MM-DD'),
   body('deadlineType').optional().isIn(['hard', 'soft']).withMessage('deadlineType must be hard or soft'),
   body('description').optional().isString(),
+  body('preferredDate').optional().isDate().withMessage('preferredDate must be YYYY-MM-DD'),
+  body('preferredStartTime').optional().matches(/^([01]\d|2[0-3]):[0-5]\d$/).withMessage('preferredStartTime must be HH:MM'),
+  body('preferredEndTime').optional().matches(/^([01]\d|2[0-3]):[0-5]\d$/).withMessage('preferredEndTime must be HH:MM'),
 ];
 
 const updateRules = [
